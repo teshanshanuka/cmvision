@@ -268,7 +268,7 @@ void ColorGuiFrame::OnClick(wxMouseEvent &event)
   b = rgb_image_[py * (width_ * 3) + px * 3 + 2];
 
   std::ostringstream stream1;
-  stream1 << "( " <<  r  << ", " << g << ", " << b << " )";
+  stream1 << "(" <<  r  << ", " << g << ", " << b << ")";
   rgbText_->SetValue(wxString::FromAscii(stream1.str().c_str()));
 
   RGB2YUV(r, g, b, y, u, v);
