@@ -139,7 +139,6 @@ void ColorGuiFrame::OnQuit(wxCommandEvent &event)
 
 void ColorGuiFrame::DrawImage(const sensor_msgs::ImageConstPtr &msg)
 {
-  cv::Mat *cvImage;
   cv::Size size;
 
   const sensor_msgs::Image img = *msg;
@@ -147,10 +146,9 @@ void ColorGuiFrame::DrawImage(const sensor_msgs::ImageConstPtr &msg)
   // Get the image as and RGB image
   cv_bridge::CvImagePtr image_ptr = cv_bridge::toCvCopy(msg, "rgb8");
 
-  cv::Mat cvImageRef(image_ptr->image);
-  cvImage = &cvImageRef;
+  cv::Mat cvImage(image_ptr->image);
 
-  size = cvImage->size();
+  size = cvImage.size();
 
   if (width_ != size.width || height_ != size.height)
   {
@@ -173,13 +171,13 @@ void ColorGuiFrame::DrawImage(const sensor_msgs::ImageConstPtr &msg)
   width_ = size.width;
   height_ = size.height;
 
-  std::memcpy(rgb_image_, &(cvImage->data[0]), width_ * height_ * 3);
+  std::memcpy(rgb_image_, cvImage.data, width_ * height_ * 3);
   // Convert image to LAB color space
-  cv::cvtColor(*cvImage, *cvImage, cv::COLOR_RGB2Lab);
-  std::memcpy(lab_image_, &(cvImage->data[0]), width_ * height_ * 3);
+  cv::cvtColor(cvImage, cvImage, cv::COLOR_RGB2Lab);
+  std::memcpy(lab_image_, cvImage.data, width_ * height_ * 3);
 
   // Find the color blobs
-  if (!vision_->processFrame(reinterpret_cast<image_pixel *>(cvImage->data)))
+  if (!vision_->processFrame(reinterpret_cast<image_pixel *>(cvImage.data)))
   {
     ROS_ERROR("Frame error.");
     return;
