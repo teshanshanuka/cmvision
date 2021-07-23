@@ -30,7 +30,7 @@
 /** \author Nate Koenig and Peter Pastor */
 
 #include <ros/ros.h>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <sensor_msgs/Image.h>
 #include <wx/wx.h>
 

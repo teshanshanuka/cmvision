@@ -37,9 +37,9 @@
 
 bool ColorGuiApp::OnInit()
 {
-  char **local_argv = new char*[ argc ];
-  for (int i =0; i < argc; i++)
-    local_argv[i] = strdup( wxString( argv[i] ).mb_str() );
+  char **local_argv = new char *[argc];
+  for (int i = 0; i < argc; i++)
+    local_argv[i] = strdup(wxString(argv[i]).mb_str());
 
   ros::init(argc, local_argv, "cmvision");
   ros::NodeHandle node_handle;
@@ -52,28 +52,25 @@ bool ColorGuiApp::OnInit()
   SetTopWindow(frame_);
 
   update_timer_ = new wxTimer(this);
-  update_timer_->Start( 33 );
+  update_timer_->Start(33);
 
-  Connect( update_timer_->GetId(), wxEVT_TIMER, wxTimerEventHandler( ColorGuiApp::OnUpdate ), NULL, this);
+  Connect(update_timer_->GetId(), wxEVT_TIMER, wxTimerEventHandler(ColorGuiApp::OnUpdate), NULL, this);
 
   return true;
 }
 
-void ColorGuiApp::OnUpdate( wxTimerEvent &event )
+void ColorGuiApp::OnUpdate(wxTimerEvent &event)
 {
   ros::spinOnce();
 }
 
-void ColorGuiApp::imageCB(const sensor_msgs::ImageConstPtr& msg)
+void ColorGuiApp::imageCB(const sensor_msgs::ImageConstPtr &msg)
 {
-  frame_->DrawImage( msg );
+  frame_->DrawImage(msg);
 }
 
-
-
-
 ColorGuiFrame::ColorGuiFrame()
-  : wxFrame(NULL, -1, wxT("Color Gui"), wxDefaultPosition, wxSize(800,600), wxDEFAULT_FRAME_STYLE)
+    : wxFrame(NULL, -1, wxT("Color Gui"), wxDefaultPosition, wxSize(800, 600), wxDEFAULT_FRAME_STYLE)
 {
 
   wxInitAllImageHandlers();
@@ -87,39 +84,39 @@ ColorGuiFrame::ColorGuiFrame()
   item = file_menu->Append(wxID_EXIT, wxT("&Quit\tCtrl-Q"));
   Connect(item->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ColorGuiFrame::OnQuit), NULL, this);
 
-  menuBar->Append( file_menu, _("&File") );
-  
-  SetMenuBar( menuBar );
+  menuBar->Append(file_menu, _("&File"));
+
+  SetMenuBar(menuBar);
 
   CreateStatusBar();
-  SetStatusText( _("Click on the image to select colors. Use scroll wheel to zoom.") );
+  SetStatusText(_("Click on the image to select colors. Use scroll wheel to zoom."));
 
-  image_panel_ = new wxPanel(this, wxID_ANY, wxPoint(0,0), wxSize(640,480));
+  image_panel_ = new wxPanel(this, wxID_ANY, wxPoint(0, 0), wxSize(640, 480));
 
   wxStaticText *rgblabel = new wxStaticText(this, -1, wxT("RGB:"));
-  rgbText_ = new wxTextCtrl(this,-1,wxT(""));
+  rgbText_ = new wxTextCtrl(this, -1, wxT(""));
 
   wxStaticText *abLabel = new wxStaticText(this, -1, wxT("AB:"));
-  abText_ = new wxTextCtrl(this,-1,wxT(""));
+  abText_ = new wxTextCtrl(this, -1, wxT(""));
 
   wxBoxSizer *hsizer1 = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer *hsizer2 = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer *vsizer = new wxBoxSizer(wxVERTICAL);
 
-  hsizer2->Add( rgblabel, 0, wxALIGN_CENTER_VERTICAL| wxLEFT, 10);
-  hsizer2->Add( rgbText_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT, 2);
+  hsizer2->Add(rgblabel, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10);
+  hsizer2->Add(rgbText_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT, 2);
 
-  hsizer2->Add( abLabel, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10);
-  hsizer2->Add( abText_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT, 2);
-  hsizer2->Add(50,1,0);
+  hsizer2->Add(abLabel, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10);
+  hsizer2->Add(abText_, 1, wxALIGN_CENTER_VERTICAL | wxLEFT, 2);
+  hsizer2->Add(50, 1, 0);
 
   vsizer->Add(image_panel_, 0, wxEXPAND);
-  vsizer->Add(20,2,0);
-  vsizer->Add(hsizer2, 0, wxALIGN_LEFT | wxEXPAND );
+  vsizer->Add(20, 2, 0);
+  vsizer->Add(hsizer2, 0, wxALIGN_LEFT | wxEXPAND);
   this->SetSizer(vsizer);
 
-	width_ = 0;
-	height_ = 0;
+  width_ = 0;
+  height_ = 0;
 
   scale_ = 1.0;
   width_ = 0;
@@ -133,7 +130,6 @@ ColorGuiFrame::ColorGuiFrame()
   image_panel_->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ColorGuiFrame::OnClick), NULL, this);
 
   Connect(wxEVT_MOUSEWHEEL, wxMouseEventHandler(ColorGuiFrame::OnMouseWheel));
-
 }
 
 void ColorGuiFrame::OnQuit(wxCommandEvent &event)
@@ -141,16 +137,16 @@ void ColorGuiFrame::OnQuit(wxCommandEvent &event)
   Close(true);
 }
 
-void ColorGuiFrame::DrawImage(const sensor_msgs::ImageConstPtr& msg)
+void ColorGuiFrame::DrawImage(const sensor_msgs::ImageConstPtr &msg)
 {
-  IplImage cvImageRef, *cvImage;
+  cv::Mat cvImageRef, *cvImage;
   CvSize size;
 
   const sensor_msgs::Image img = *msg;
 
   // Get the image as and RGB image
   cv_bridge::CvImagePtr image_ptr = cv_bridge::toCvCopy(msg, "rgb8");
-  cvImageRef = IplImage(image_ptr->image);
+  cvImageRef = image_ptr->image;
   cvImage = &cvImageRef;
 
   size = cvGetSize(cvImage);
@@ -176,25 +172,25 @@ void ColorGuiFrame::DrawImage(const sensor_msgs::ImageConstPtr& msg)
   width_ = size.width;
   height_ = size.height;
 
-  memcpy(rgb_image_, cvImage->imageData, width_ * height_ * 3);
+  memcpy(rgb_image_, cvImage, width_ * height_ * 3);
 
   // Convert image to LAB color space
-  cvCvtColor(cvImage, cvImage, CV_RGB2Lab);
-  
-  memcpy(lab_image_, cvImage->imageData, width_ * height_ * 3);
+  cv::cvtColor(*cvImage, *cvImage, CV_RGB2Lab);
+
+  memcpy(lab_image_, cvImage, width_ * height_ * 3);
 
   // Find the color blobs
-  if (!vision_->processFrame(reinterpret_cast<image_pixel*> (cvImage->imageData)))
+  if (!vision_->processFrame(reinterpret_cast<image_pixel *>(cvImage)))
   {
-	ROS_ERROR("Frame error.");
-	return;
+    ROS_ERROR("Frame error.");
+    return;
   }
 
-  int xsrc = (scale_pos_x_*scale_) - scale_pos_x_;
-  int ysrc = (scale_pos_y_*scale_) - scale_pos_y_;
+  int xsrc = (scale_pos_x_ * scale_) - scale_pos_x_;
+  int ysrc = (scale_pos_y_ * scale_) - scale_pos_y_;
 
   wxImage image(width_, height_, rgb_image_, true);
-  image.Rescale(width_*scale_,height_*scale_);
+  image.Rescale(width_ * scale_, height_ * scale_);
 
   wxBitmap bitmap(image);
 
@@ -205,39 +201,38 @@ void ColorGuiFrame::DrawImage(const sensor_msgs::ImageConstPtr& msg)
   if (xsrc < 0 || ysrc < 0)
     dc.Clear();
 
-  dc.Blit(0,0, 640, 480, &memDC, xsrc, ysrc);
+  dc.Blit(0, 0, 640, 480, &memDC, xsrc, ysrc);
 
-	// Get all the blobs
-	for (int ch = 0; ch < CMV_MAX_COLORS; ++ch)
-	{
-		// Get the descriptive color
-		rgb c = vision_->getColorVisual(ch);
+  // Get all the blobs
+  for (int ch = 0; ch < CMV_MAX_COLORS; ++ch)
+  {
+    // Get the descriptive color
+    rgb c = vision_->getColorVisual(ch);
 
-		// Grab the regions for this color
-		CMVision::region* r = NULL;
+    // Grab the regions for this color
+    CMVision::region *r = NULL;
 
-		for (r = vision_->getRegions(ch); r != NULL; r = r->next)
-		{
+    for (r = vision_->getRegions(ch); r != NULL; r = r->next)
+    {
       dc.SetBrush(*wxTRANSPARENT_BRUSH);
-      int x1 = (r->x1*scale_) - xsrc;
-      int y1 = (r->y1*scale_) - ysrc;
-      int x2 = (r->x2*scale_) - xsrc;
-      int y2 = (r->y2*scale_) - ysrc;
+      int x1 = (r->x1 * scale_) - xsrc;
+      int y1 = (r->y1 * scale_) - ysrc;
+      int x2 = (r->x2 * scale_) - xsrc;
+      int y2 = (r->y2 * scale_) - ysrc;
 
       int w = x2 - x1;
       int h = y2 - y1;
 
       dc.DrawRectangle(x1, y1, w, h);
-		}
-	}
+    }
+  }
 
   int x, y;
   GetPosition(&x, &y);
-// Setting size is commented out because it breaks the gui:
-// Text boxes become invisible.
-//  SetSize(x,y, width_, height_+80);
+  // Setting size is commented out because it breaks the gui:
+  // Text boxes become invisible.
+  //  SetSize(x,y, width_, height_+80);
 }
-
 
 void ColorGuiFrame::OnReset(wxCommandEvent &event)
 {
@@ -250,21 +245,20 @@ void ColorGuiFrame::OnClick(wxMouseEvent &event)
 {
   int r, g, b, l, a, b2;
 
-  int px = (event.m_x/scale_) + ((scale_pos_x_*scale_) - scale_pos_x_)/scale_;
-  int py = (event.m_y/scale_) + ((scale_pos_y_*scale_) - scale_pos_y_)/scale_;
+  int px = (event.m_x / scale_) + ((scale_pos_x_ * scale_) - scale_pos_x_) / scale_;
+  int py = (event.m_y / scale_) + ((scale_pos_y_ * scale_) - scale_pos_y_) / scale_;
 
   r = rgb_image_[py * (width_ * 3) + px * 3 + 0];
   g = rgb_image_[py * (width_ * 3) + px * 3 + 1];
   b = rgb_image_[py * (width_ * 3) + px * 3 + 2];
 
   std::ostringstream stream1;
-  stream1 << "(" <<  r  << ", " << g << ", " << b << ")";
+  stream1 << "(" << r << ", " << g << ", " << b << ")";
   rgbText_->SetValue(wxString::FromAscii(stream1.str().c_str()));
 
   l = lab_image_[py * (width_ * 3) + px * 3 + 0];
   a = lab_image_[py * (width_ * 3) + px * 3 + 1];
   b2 = lab_image_[py * (width_ * 3) + px * 3 + 2];
-
 
   int l_low, l_high, a_low, a_high, b_low, b_high;
 

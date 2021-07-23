@@ -27,7 +27,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 
 #include <cmvision/Blobs.h>
 #include "conversions.h"

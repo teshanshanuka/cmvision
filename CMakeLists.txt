@@ -53,7 +53,6 @@ add_executable(colorgui
 	src/color_gui.cpp
 )
 target_link_libraries(colorgui 
-  fltk
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${wxWidgets_LIBRARIES}
