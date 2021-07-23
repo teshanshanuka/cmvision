@@ -2,7 +2,7 @@
 
   <!-- Location of the cmvision color file -->
   <param name="cmvision/color_file" type="string" 
-         value="$(find cmvision)/colors.txt" />
+         value="$(find cmvision)/config/colors.txt" />
 
   <!-- Turn debug output on or off -->
   <param name="cmvision/debug_on" type="bool" value="true"/>
