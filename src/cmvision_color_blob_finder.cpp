@@ -26,12 +26,12 @@
 // author Andy Martignoni III, Brian Gerkey, Brendan Burns, Ben Grocholsky, Brad Kratochvil
 
 #include <opencv2/highgui.hpp>
-#include <opencv2/highgui/highgui_c.h>
 
 #include <ros/time.h>
 #include <cv_bridge/cv_bridge.h>
 
 #include "cmvision_color_blob_finder.h"
+
 
 using namespace color_blob_track;
 
@@ -98,7 +98,7 @@ bool CMVisionColorBlobFinder::initialize(ros::NodeHandle &node_handle)
 
 	if (debug_on_)
 	{
-		cvNamedWindow("Image");
+		cv::namedWindow("Image");
 	}
 
 	return true;
@@ -106,8 +106,8 @@ bool CMVisionColorBlobFinder::initialize(ros::NodeHandle &node_handle)
 
 void CMVisionColorBlobFinder::imageCB(const sensor_msgs::ImageConstPtr &msg)
 {
-	cv::Mat cvImageRef, *cvImage, *debug_img_;
-	CvSize size;
+	cv::Mat debug_img_;
+	cv::Size size;
 
 	const sensor_msgs::Image img = *msg;
 
@@ -119,10 +119,10 @@ void CMVisionColorBlobFinder::imageCB(const sensor_msgs::ImageConstPtr &msg)
 
 	// Get the image as and RGB image
 	cv_bridge::CvImagePtr image = cv_bridge::toCvCopy(msg, "bgr8");
-	cvImageRef = image->image;
-	cvImage = &cvImageRef;
+	cv::Mat cvImage(image->image);
+	// cvImage = &cvImageRef;
 
-	size = cvGetSize(cvImage);
+	size = cvImage.size();
 
 	// this shouldn't change often
 	if ((size.width != width_) || (size.height != height_))
@@ -159,18 +159,17 @@ void CMVisionColorBlobFinder::imageCB(const sensor_msgs::ImageConstPtr &msg)
 	// Smooth the image, if turned on
 	if (mean_shift_on_)
 	{
-		cvPyrMeanShiftFiltering(cvImage, cvImage, spatial_radius_, color_radius_);
+		cv::pyrMeanShiftFiltering(cvImage, cvImage, spatial_radius_, color_radius_);
 	}
 
 	if (debug_on_)
 	{
-		cvCopy(cvImage, debug_img_);
+		cvImage.copyTo(debug_img_);
 	}
 
-	cvCvtColor(cvImage, cvImage, CV_BGR2Lab);
-
+	cv::cvtColor(cvImage, cvImage, cv::COLOR_BGR2Lab);
 	// Find the color blobs
-	if (!vision_->processFrame(reinterpret_cast<image_pixel *>(cvImage)))
+	if (!vision_->processFrame(reinterpret_cast<image_pixel *>(cvImage.data)))
 	{
 		ROS_ERROR("Frame error.");
 		return;
@@ -200,7 +199,7 @@ void CMVisionColorBlobFinder::imageCB(const sensor_msgs::ImageConstPtr &msg)
 
 			if (debug_on_)
 			{
-				cv::rectangle(*debug_img_, cvPoint(r->x1, r->y1), cvPoint(r->x2, r->y2), CV_RGB(c.red, c.green, c.blue));
+				cv::rectangle(debug_img_, cvPoint(r->x1, r->y1), cvPoint(r->x2, r->y2), CV_RGB(c.red, c.green, c.blue));
 			}
 
 			blob_message_.blobs[blob_count_].name = name;
@@ -224,9 +223,8 @@ void CMVisionColorBlobFinder::imageCB(const sensor_msgs::ImageConstPtr &msg)
 
 	if (debug_on_)
 	{
-		cvShowImage("Image", debug_img_);
-
-		cvWaitKey(3);
+		cv::imshow("Image", debug_img_);
+		cv::waitKey(3);
 	}
 
 	blob_message_.blob_count = blob_count_;
