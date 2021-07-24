@@ -696,69 +696,77 @@ bool CMVision::loadOptions(const char *filename)
 
   // Loop ever lines, processing via a simple parser
   state = 0;
-  while(fgets(buf,CMV_MAX_BUF,in)){
-    switch(state){
-      case CMV_STATE_SCAN:
-        n = sscanf(buf,"[%s",str);
-        if(n == 1){
-          if(!strncasecmp(str,"colors]",CMV_MAX_BUF)){
-            state = CMV_STATE_COLORS;
-            i = 0;
-	  }else if(!strncasecmp(str,"thresholds]",CMV_MAX_BUF)){
-	    state = CMV_STATE_THRESH;
-            i = 0;
-	  }else{
-            printf("CMVision: Ignoring unknown option header '%s'.\n",str);
-          }
-	}
-        break;
-      case CMV_STATE_COLORS:
-        n = sscanf(buf,"(%d,%d,%d) %lf %d %s",&r,&g,&b,&merge,&exp_num,str);
-        if(n == 6){
-          // printf("(%d,%d,%d) %lf %d '%s'\n",
-	  //        r,g,b,merge,exp_num,str); fflush(stdout);
-          if(i < CMV_MAX_COLORS){
-            c = &colors[i];
-            c->color.red   = r;
-            c->color.green = g;
-            c->color.blue  = b;
-            c->name  = strdup(str);
-            c->merge = merge;
-	    c->expected_num = exp_num;
-            i++;
-	  }else{
-	    printf("CMVision: Too many colors, ignoring '%s'.\n",str);
-	  }
-	}else if(n == 0){
-          state = CMV_STATE_SCAN;
-        }
-        break;
-      case CMV_STATE_THRESH:
-        n = sscanf(buf,"(%d:%d,%d:%d)",&a1,&a2,&b1,&b2);
-        if(n == 4){
-          // printf("(%d:%d,%d:%d,%d:%d)\n",l1,l2,a1,a2,b1,b2);
-          if(i < CMV_MAX_COLORS){
-            c = &colors[i];
-            c->a_low = a1;  c->a_high = a2;
-            c->b_low = b1;  c->b_high = b2;
+  while (fgets(buf, CMV_MAX_BUF, in)) {
+    // skip comment lines
+    if (buf[0] == '#')
+      continue;
 
-            k = (1 << i);
-            set_bits(a_class,CMV_COLOR_LEVELS,a1,a2,k);
-            set_bits(b_class,CMV_COLOR_LEVELS,b1,b2,k);
-            i++;
-	  }else{
-	    printf("CMVision: Too many thresholds.\n");
-	  }
-	}else if(n == 0){
-          state = CMV_STATE_SCAN;
+    switch (state) {
+    case CMV_STATE_SCAN:
+      n = sscanf(buf, "[%s", str);
+      if (n == 1) {
+
+        if (!strncasecmp(str, "colors]", CMV_MAX_BUF)) {
+          state = CMV_STATE_COLORS;
+          i = 0;
+        } else if (!strncasecmp(str, "thresholds]", CMV_MAX_BUF)) {
+          state = CMV_STATE_THRESH;
+          i = 0;
+        } else {
+          printf("CMVision: Ignoring unknown option header '%s'.\n", str);
         }
-        break;
+      }
+      break;
+    case CMV_STATE_COLORS:
+      n = sscanf(buf, "(%d,%d,%d) %lf %d %s", &r, &g, &b, &merge, &exp_num,
+                 str);
+      if (n == 6) {
+        // printf("RGB: (%d,%d,%d) %lf %d '%s'\n",
+        //        r,g,b,merge,exp_num,str); fflush(stdout);
+        if (i < CMV_MAX_COLORS) {
+          c = &colors[i];
+          c->color.red = r;
+          c->color.green = g;
+          c->color.blue = b;
+          c->name = strdup(str);
+          c->merge = merge;
+          c->expected_num = exp_num;
+          i++;
+        } else {
+          printf("CMVision: Too many colors, ignoring '%s'.\n", str);
+        }
+      } else if (n == 0) {
+        state = CMV_STATE_SCAN;
+      }
+      break;
+    case CMV_STATE_THRESH:
+      n = sscanf(buf, "(%d:%d,%d:%d)", &a1, &a2, &b1, &b2);
+      if (n == 4) {
+        // printf("THRESH: (%d:%d,%d:%d)\n", a1,a2,b1,b2);
+        if (i < CMV_MAX_COLORS) {
+          c = &colors[i];
+          c->a_low = a1;
+          c->a_high = a2;
+          c->b_low = b1;
+          c->b_high = b2;
+
+          k = (1 << i);
+          set_bits(a_class, CMV_COLOR_LEVELS, a1, a2, k);
+          set_bits(b_class, CMV_COLOR_LEVELS, b1, b2, k);
+          i++;
+        } else {
+          printf("CMVision: Too many thresholds.\n");
+        }
+      } else if (n == 0) {
+        state = CMV_STATE_SCAN;
+      }
+      break;
     }
   }
 
   /*
   for(i=0; i<CMV_COLOR_LEVELS; i++){
-    printf("%08X %08X %08X\n",l_class[i],a_class[i],b_class[i]);
+    printf("a:%08X b:%08X\n", a_class[i],b_class[i]);
   }
   */
 
