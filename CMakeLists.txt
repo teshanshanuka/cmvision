@@ -24,7 +24,10 @@ generate_messages(
 
 catkin_package(CATKIN_DEPENDS message_runtime std_msgs)
 
-include_directories(${catkin_INCLUDE_DIRS})
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+  include
+)
 
 find_package(wxWidgets REQUIRED)
 include(${wxWidgets_USE_FILE})
@@ -65,7 +68,9 @@ install(TARGETS cmvision colorgui
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(FILES cmvision.launch colors.txt
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
-
+install(DIRECTORY config/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
+)
