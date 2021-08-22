@@ -30,7 +30,7 @@
 #include <ros/time.h>
 #include <cv_bridge/cv_bridge.h>
 
-#include "cmvision_color_blob_finder.h"
+#include "cmvision/cmvision_color_blob_finder.h"
 
 
 using namespace color_blob_track;
@@ -118,7 +118,7 @@ void CMVisionColorBlobFinder::imageCB(const sensor_msgs::ImageConstPtr &msg)
 	ros::WallTime startt = ros::WallTime::now();
 
 	// Get the image as and RGB image
-	cv_bridge::CvImagePtr image = cv_bridge::toCvCopy(msg, "bgr8");
+	cv_bridge::CvImagePtr image = cv_bridge::toCvCopy(msg, "rgb8");
 	cv::Mat cvImage(image->image);
 	// cvImage = &cvImageRef;
 
@@ -165,18 +165,17 @@ void CMVisionColorBlobFinder::imageCB(const sensor_msgs::ImageConstPtr &msg)
 	if (debug_on_)
 	{
 		cvImage.copyTo(debug_img_);
+		// Convert to BGR because cv works in BGR
+		cv::cvtColor(debug_img_, debug_img_, cv::COLOR_RGB2BGR);
 	}
 
-	cv::cvtColor(cvImage, cvImage, cv::COLOR_BGR2Lab);
+	cv::cvtColor(cvImage, cvImage, cv::COLOR_RGB2Lab);
 	// Find the color blobs
 	if (!vision_->processFrame(reinterpret_cast<image_pixel *>(cvImage.data)))
 	{
 		ROS_ERROR("Frame error.");
 		return;
 	}
-
-	//image_bridge_.fromImage(*msg, "bgr8");
-	//cvImage = image_bridge_.toIpl();
 
 	// Get all the blobs
 	blob_count_ = 0;

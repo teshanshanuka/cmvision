@@ -18,7 +18,7 @@
  */
 
 #include <string.h>
-#include "conversions.h"
+#include "cmvision/conversions.h"
 
 #if !defined (WIN32)
   // This doesn't need to be extern on Windows (why does it need to be elsewhere?)

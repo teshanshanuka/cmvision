@@ -32,8 +32,8 @@
 #include <string>
 #include <cv_bridge/cv_bridge.h>
 
-#include "color_gui.h"
-#include "conversions.h"
+#include "cmvision/color_gui.h"
+#include "cmvision/conversions.h"
 
 bool ColorGuiApp::OnInit()
 {

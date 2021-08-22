@@ -31,7 +31,7 @@
       2000-07-20:  Added dual threshold capability (JRB)
   =========================================================================*/
 
-#include "cmvision.h"
+#include "cmvision/cmvision.h"
 #include <string.h>
 #if !defined (WIN32)
   #include <strings.h>
@@ -718,8 +718,7 @@ bool CMVision::loadOptions(const char *filename)
       }
       break;
     case CMV_STATE_COLORS:
-      n = sscanf(buf, "(%d,%d,%d) %lf %d %s", &r, &g, &b, &merge, &exp_num,
-                 str);
+      n = sscanf(buf, "(%d,%d,%d) %lf %d %s", &r, &g, &b, &merge, &exp_num, str);
       if (n == 6) {
         // printf("RGB: (%d,%d,%d) %lf %d '%s'\n",
         //        r,g,b,merge,exp_num,str); fflush(stdout);
@@ -742,7 +741,6 @@ bool CMVision::loadOptions(const char *filename)
     case CMV_STATE_THRESH:
       n = sscanf(buf, "(%d:%d,%d:%d)", &a1, &a2, &b1, &b2);
       if (n == 4) {
-        // printf("THRESH: (%d:%d,%d:%d)\n", a1,a2,b1,b2);
         if (i < CMV_MAX_COLORS) {
           c = &colors[i];
           c->a_low = a1;

@@ -21,7 +21,7 @@
  */
 
 #include <ros/ros.h>
-#include "cmvision_color_blob_finder.h"
+#include "cmvision/cmvision_color_blob_finder.h"
 
 int main( int argc, char **argv)
 {
