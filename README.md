@@ -1,12 +1,8 @@
-# cmvision
+# cmvision - Fast color blob detector
 
 ## cmvision port for ROS Noetic. Tested on Ubuntu 20.04
 
-- [Original work](http://library.isr.ist.utl.pt/docs/roswiki/cmvision.html) by Nate Koenig
-
-- [ROS Hydro port](https://github.com/utexas-bwi/cmvision) by Piyush Khandelwal
-
-- [ROS Melodic port](https://github.com/kbogert/cmvision) by Kenneth Bogert
+![demo.gif](static/demo.gif)
 
 ### Dependancies
 
@@ -38,3 +34,11 @@
 2. Publish debug image to a rostopic with a new param to enable it
 
 3. Remove the need for the spaces being exactly correctly for specifying colors in `colors.txt` 
+
+## Credits
+
+- [Original work](http://library.isr.ist.utl.pt/docs/roswiki/cmvision.html) by Nate Koenig
+
+- [ROS Hydro port](https://github.com/utexas-bwi/cmvision) by Piyush Khandelwal
+
+- [ROS Melodic port](https://github.com/kbogert/cmvision) by Kenneth Bogert
