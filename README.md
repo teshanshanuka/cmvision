@@ -2,6 +2,12 @@
 
 ## cmvision port for ROS Noetic. Tested on Ubuntu 20.04
 
+- [Original work](http://library.isr.ist.utl.pt/docs/roswiki/cmvision.html) by Nate Koenig
+
+- [ROS Hydro port](https://github.com/utexas-bwi/cmvision) by Piyush Khandelwal
+
+- [ROS Melodic port](https://github.com/kbogert/cmvision) by Kenneth Bogert
+
 ### Dependancies
 
 * WxWidgets
@@ -24,3 +30,11 @@
     * Pass the colors file with param `cmvision/color_file`
 
     * Set param `cmvision/debug_on` to `true` to display the detections
+
+### TODO
+
+1. Remove WxWidgets dependancy and use OpenCV highgui for `colorgui`
+
+2. Publish debug image to a rostopic with a new param to enable it
+
+3. Remove the need for the spaces being exactly correctly for specifying colors in `colors.txt` 

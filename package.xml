@@ -3,10 +3,11 @@
   <name>cmvision</name>
   <version>0.5.0</version>
   <description>
-    Node for the Color Machine Vision Project, used for fast color blob detection
+    Node for fast color blob detection
   </description>
 
-  <maintainer email="piyushk@gmail.com">Piyush Khandelwal</maintainer>
+  <author>Nate Koenig</author>
+  <maintainer email="teshanuka@gmail.com">Teshan Liyanage</maintainer>
 
   <license>LGPL</license>
 
